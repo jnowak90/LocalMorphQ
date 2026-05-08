@@ -1,0 +1,17 @@
+cv2 == 4.13.0
+joypy == 0.2.6
+matplotlib == 3.10.7
+networkx == 3.4.2
+numpy == 2.2.6
+packaging == 25.0
+pandas == 2.3.3
+PIL == 12.0.0
+pingouin == 0.5.5
+read_roi == 1.6.0
+rich == 14.2.0
+scipy == 1.15.3
+shapely == 2.1.2
+skimage == 0.25.2
+sklearn == 1.7.2
+statsmodels == 0.14.5
+yaml == 5.4.1
