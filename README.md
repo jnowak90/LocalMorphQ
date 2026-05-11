@@ -1,6 +1,8 @@
 # LocalMorphQ — Getting Started
 
-This guide explains how to set up the environment and reproduce the data and figures from the paper: Nowak et al., Unraveling the actin cytoskeletal role in the morphogenesis of pavement cells using mask-based approaches. (Submitted)
+This guide explains how to set up the environment and reproduce the data and figures from the paper: 
+
+Nowak et al., <em>Unraveling the actin cytoskeletal role in the morphogenesis of pavement cells using mask-based approaches.</em> (Submitted)
 
 ---
 
@@ -62,8 +64,8 @@ pip install -r requirements.txt
 │   └── GraVisUtils.py
 |
 ├── data/
-│   ├── AFs
-│   └── MTs
+│   ├── AFs/
+│   └── MTs/
 |
 └── figures/
     ├── Figure1.py
@@ -90,16 +92,18 @@ python main.py --data /path/to/data --config /path/to/config.yaml
 | `--data` | Path to the input data folder |
 | `--config` | Path to the YAML configuration file |
 
+
 To test the code, use:
 ```bash
-python main.py --data data/ --config config//config_Example.yaml
+python main.py --data data/ --config config/config_Example.yaml
 ```
 
 ### Step 2 — Reproduce the data
 
 This will generate the processed output files required for figure reproduction.
 
-To replicate the data provided in the study, first download the data from: 
+To replicate the data provided in the study, first download the data from Dryad and save in the data/ folder.
+
 Then, use:
 ```bash
 python main.py --data data/Dryad/Cotyledons/ --config config/config_Cotyledons.yaml
