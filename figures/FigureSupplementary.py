@@ -88,7 +88,7 @@ def main():
     cmapBinary = matplotlib.colors.ListedColormap([[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
     cmapBinaryRed = matplotlib.colors.ListedColormap([[0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 1.0]]) # red
     
-    '''
+    
     ###############################
     ########## Figure S2 ##########
     ###############################  
@@ -296,9 +296,7 @@ def main():
         tableFigS2.add_column(str(col))
     for _, row in pValues.iterrows():
         tableFigS2.add_row(*[str(v) for v in row])
-    '''
-    console = Console()
-    '''
+
     console.print('[bold blue]Supplementary Figure 2[/bold blue]')
     console.print(tableFigS2)
     
@@ -450,7 +448,7 @@ def main():
     plt.tight_layout()
     fig.savefig(pathPlotsSupplementary / 'FigureS3_Cotyledons_CytoskeletonDensityMasks_WT_Mutant.png', bbox_inches='tight', dpi=300)
     plt.close()    
-    '''
+    
     tableFigS3 = Table(title='P-values for different mask approaches of AF and MT in lobes and necks')
     tableFigS3.add_column('', justify='left')
     tableFigS3.add_column('Perpendicular mask', justify='center')
@@ -492,7 +490,7 @@ def main():
     console.print('[bold blue]Supplementary Figure 3[/bold blue]')
     console.print(tableFigS3)
 
-    '''
+    
     ###############################
     ########## Figure S4 ##########
     ###############################  
@@ -1350,7 +1348,7 @@ def main():
     
     console.print('[bold blue]Supplementary Table 4[/bold blue]')
     console.print(tableS4)
-    '''
+    
     
 ###############################################################################
 def load_pickle_file(pathToPickleFile):
