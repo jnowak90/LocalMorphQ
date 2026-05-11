@@ -102,7 +102,7 @@ python main.py --data data/ --config config/config_Example.yaml
 
 This will generate the processed output files required for figure reproduction.
 
-To replicate the data provided in the study, first download the data from Dryad and save in the data/ folder.
+To replicate the data provided in the study, first download the data from Dryad and save in the data/ folder. Copy the config files into the config/ folder.
 
 Then, use:
 ```bash
