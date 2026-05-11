@@ -1,6 +1,6 @@
 # LocalMorphQ — Getting Started
 
-This guide explains how to set up the environment and reproduce the data and figures from the paper.
+This guide explains how to set up the environment and reproduce the data and figures from the paper: Nowak et al., Unraveling the actin cytoskeletal role in the morphogenesis of pavement cells using mask-based approaches. (Submitted)
 
 ---
 
@@ -16,8 +16,8 @@ This guide explains how to set up the environment and reproduce the data and fig
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone https://github.com/jnowak90/LocalMorphQ
+cd LocalMorphQ
 ```
 
 ### 2. Create and activate a virtual environment
@@ -45,19 +45,32 @@ pip install -r requirements.txt
 ## Repository structure
 
 ```
-├── main.py                   # Data processing entry point
-├── Processing.py             # Core processing functions
-├── Utils.py                  # General utility functions
-├── GraVisPreprocessing.py    # GraVis preprocessing pipeline
-├── GraVisExtraction.py       # GraVis extraction pipeline
-├── GraVisUtils.py            # GraVis utility functions
-├── Figure1.py                # Figure 1 reproduction
-├── Figure2.py                # Figure 2 reproduction
-├── Figure3.py                # Figure 3 reproduction
-├── Figure4.py                # Figure 4 reproduction
-├── FigureSupplementary.py    # Supplementary figures reproduction
-├── requirements.txt          # Python dependencies
-└── README.md
+├── main.py
+├── requirements.txt
+├── README.md
+│
+├── config/
+│   ├── config_Example.yaml
+│   └── config_Template.yaml
+│
+├── src/
+│   ├── __init__.py
+│   ├── Processing.py
+│   ├── Utils.py
+│   ├── GraVisExtraction.py
+│   ├── GraVisPreProcessing.py
+│   └── GraVisUtils.py
+|
+├── data/
+│   ├── AFs
+│   └── MTs
+|
+└── figures/
+    ├── Figure1.py
+    ├── Figure2.py
+    ├── Figure3.py
+    ├── Figure4.py
+    └── FiguresSupplementary.py
 ```
 
 ---
@@ -77,21 +90,35 @@ python main.py --data /path/to/data --config /path/to/config.yaml
 | `--data` | Path to the input data folder |
 | `--config` | Path to the YAML configuration file |
 
+To test the code, use:
+```bash
+python main.py --data data/ --config config//config_Example.yaml
+```
+
+### Step 2 — Reproduce the data
+
 This will generate the processed output files required for figure reproduction.
 
-### Step 2 — Reproduce the figures
+To replicate the data provided in the study, first download the data from: 
+Then, use:
+```bash
+python main.py --data data/Dryad/Cotyledons/ --config config/config_Cotyledons.yaml
+python main.py --data data/Dryad/Leaves/ --config config/config_Leaves.yaml
+```
+
+### Step 3 — Reproduce the figures
 
 Each figure script takes the path to the processed data folder as input. Run them individually:
 
 ```bash
-python Figure1.py --data /path/to/data
-python Figure2.py --data /path/to/data
-python Figure3.py --data /path/to/data
-python Figure4.py --data /path/to/data
-python FigureSupplementary.py --data /path/to/data
+python figures/Figure1.py --data data/Dryad
+python figures/Figure2.py --data data/Dryad
+python figures/Figure3.py --data data/Dryad
+python figures/Figure4.py --data data/Dryad
+python figures/FigureSupplementary.py --data /path/to/data
 ```
 
-Figures will be saved to the output folder defined in your config file.
+Figures will be saved to a separate 'Plots' folder.
 
 ---
 
