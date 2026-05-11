@@ -1,0 +1,94 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# -----------------------------------------------------------------------------
+# Project info
+# -----------------------------------------------------------------------------
+project:
+    name: 'Example images'
+    description: 'AF/MT density quantification in pavement cells'
+    species: 'Arabidopsis thaliana'
+    tissue: 'Cotyledons'
+    stage: '48h'
+    projection: 'SMP'
+
+    
+# -----------------------------------------------------------------------------
+# Data structure
+# -----------------------------------------------------------------------------
+data: 
+    root: 'Cotyledon'
+    file_pattern: '*SMP.tif'
+    channels: ['membrane', 'filament']
+    targets: ['AFs', 'MTs']
+    conditions: ['WT']
+    timepoints: 'single'
+
+        
+# -----------------------------------------------------------------------------
+# Folder structure
+# -----------------------------------------------------------------------------    
+structure:
+    targets: ['AFs', 'MTs']
+    conditions: ['WT']
+    replicates: []
+
+
+# -----------------------------------------------------------------------------
+# Image resolutions (µm/px)
+# ----------------------------------------------------------------------------- 
+resolutions:
+    AFs: {WT: {WT_5: 0.1806913250094863}}
+    MTs: {WT: {WT_5: 0.14462570866597246}}      
+  
+        
+# -----------------------------------------------------------------------------
+# Input channel data for pavement cell segmentation
+# ----------------------------------------------------------------------------- 
+inputChannel:
+    AFs: {WT: {WT_5: {'membrane': 'C1', 'filament': 'C2'}}}
+    MTs: {WT: {WT_5: {'membrane': 'C1', 'filament': 'C2'}}}
+             
+
+# -----------------------------------------------------------------------------
+# Selected cells for analysis
+# -----------------------------------------------------------------------------
+cells:
+    AFs: {WT: {WT_5: '[5, 11, 13, 14, 15, 16, 17, 20, 24, 28, 33, 35, 37, 39, 40, 42, 43, 45, 51, 54]'}}
+    MTs: {WT: {WT_5: '[4, 5, 10, 11, 16, 17, 18, 20, 21, 23, 27, 28, 29, 30, 31, 33, 38, 41, 43, 48, 51, 52, 53, 55, 58, 59, 61, 64, 65, 66, 67, 68, 72, 83, 76, 82, 79, 84, 80, 92]'}}
+  
+            
+# -----------------------------------------------------------------------------
+# Manual changes for pavement cell segmentation
+# -----------------------------------------------------------------------------
+manualChanges:
+    AFs: {WT: {WT_5: {}}}
+    MTs: {WT: {WT_5: {}}}
+
+            
+# -----------------------------------------------------------------------------
+# Gauging parameters for cytoskeleton extraction (CytoSeg)
+# -----------------------------------------------------------------------------
+parameters:
+    AFs: {WT: {WT_5: [1.4, 2.6, 53.0, 9.0, 0.4]}}
+    MTs: {WT: {WT_5: [1.4, 2.0, 53.0, 9.0, 0.2]}}
+
+
+# -----------------------------------------------------------------------------
+# Output
+# -----------------------------------------------------------------------------
+output: 
+    globalDensities: True
+    perpendicularDensities: True
+    circularDensities: True
+    polygonalDensities: True
+    labeledCells: False
+    visibilityGraphs: False
+    cellContours: False
+    skeletonImageCells: False
+    junctions: False
+    filteredCytoskeleton: False
+    membraneSegmentationOverlay: True
+    shapeResultsTable: False
+    
+    
