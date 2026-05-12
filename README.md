@@ -64,8 +64,9 @@ pip install -r requirements.txt
 │   └── GraVisUtils.py
 |
 ├── data/
-│   ├── AFs/
-│   └── MTs/
+|   └── ExampleData/
+│       ├── AFs/
+│       └── MTs/
 |
 └── figures/
     ├── Figure1.py
@@ -95,19 +96,19 @@ python main.py --data /path/to/data --config /path/to/config.yaml
 
 To test the code, use:
 ```bash
-python main.py --data data/ --config config/config_Example.yaml
+python main.py --data data/ExampleData/ --config config/config_Example.yaml
 ```
 
 ### Step 2 — Reproduce the data
 
 This will generate the processed output files required for figure reproduction.
 
-To replicate the data provided in the study, first download the data from Dryad and save in the data/ folder. Copy the config files into the config/ folder.
+To replicate the data provided in the study, first download the data from Zenodo and save DataPCs folder in the data/ folder. Copy the config files into the config/ folder.
 
 Then, use:
 ```bash
-python main.py --data data/Dryad/Cotyledons/ --config config/config_Cotyledons.yaml
-python main.py --data data/Dryad/Leaves/ --config config/config_Leaves.yaml
+python main.py --data data/DataPCs/Cotyledons/ --config config/config_Cotyledons.yaml
+python main.py --data data/DataPCs/Leaves/ --config config/config_Leaves.yaml
 ```
 
 ### Step 3 — Reproduce the figures
@@ -115,14 +116,14 @@ python main.py --data data/Dryad/Leaves/ --config config/config_Leaves.yaml
 Each figure script takes the path to the processed data folder as input. Run them individually:
 
 ```bash
-python figures/Figure1.py --data data/Dryad
-python figures/Figure2.py --data data/Dryad
-python figures/Figure3.py --data data/Dryad
-python figures/Figure4.py --data data/Dryad
-python figures/FigureSupplementary.py --data /path/to/data
+python figures/Figure1.py --data data/DataPCs/
+python figures/Figure2.py --data data/DataPCs/
+python figures/Figure3.py --data data/DataPCs
+python figures/Figure4.py --data data/DataPCs
+python figures/FigureSupplementary.py --data data/DataPCs
 ```
 
-Figures will be saved to a separate 'Plots' folder.
+Figures will be saved to a separate 'Plots' folder, Supplementary Figures will be saved in a 'Supplementary' subfolder.
 
 ---
 
