@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/1232858106.svg)](https://doi.org/10.5281/zenodo.20139540)
+
 # LocalMorphQ — Getting Started
 
 This guide explains how to set up the environment and reproduce the data and figures from the paper: 
