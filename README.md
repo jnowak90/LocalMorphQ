@@ -1,4 +1,4 @@
-[![DOI](https://zenodo.org/badge/1232858106.svg)](https://doi.org/10.5281/zenodo.20139540)
+<a href="https://doi.org/10.5281/zenodo.20139540"><img src="https://zenodo.org/badge/1232858106.svg" alt="DOI"></a>
 
 # LocalMorphQ — Getting Started
 
