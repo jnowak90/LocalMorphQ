@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
     
 ###############################################################################
 # =========================
-# Figure 1
+# Figure 2
 # Visualization of cytoskeleton organization in wild-type cotyledon pavement cells.
 # =========================
 
@@ -95,7 +95,7 @@ def main():
     ax[0].set_ylim([-0.01, 0.2])
     ax[0].set_ylabel('Cytoskeleton density')
     plt.subplots_adjust(wspace=0.05)
-    fig.savefig(pathPlots / 'Figure1C-F_Cotyledons_CytoskeletonDensityMasks_WT.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlots / 'Figure2C-F_Cotyledons_CytoskeletonDensityMasks_WT.png', bbox_inches='tight', dpi=300)               
     plt.close()
       
     
