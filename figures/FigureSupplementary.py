@@ -35,12 +35,12 @@ import scr.Utils as ASU
 ###############################################################################
 # =========================
 # Supplememtary Figures
-#   Figure S2 - Optimal mask size
-#   Figure S3 - Different mask approaches for cytoskeleton analysis (cotyledon)
-#   Figure S4 - Segmentation of wild-type leaves
-#   Figure S5 - Segmentation of act2-1act7-1 leaves
-#   Figure S6 - Time-series analysis of lobeyness (leaves)
-#   Figure S7 - Growth rate analysis (leaves)
+#   Figure S1 - Optimal mask size
+#   Figure S2 - Different mask approaches for cytoskeleton analysis (cotyledon)
+#   Figure S3 - Segmentation of wild-type leaves
+#   Figure S4 - Segmentation of act2-1act7-1 leaves
+#   Figure S5 - Time-series analysis of lobeyness (leaves)
+#   Figure S6 - Growth rate analysis (leaves)
 #   Table S1 - Cytoskeletal denisties of different masks (cotyledon)
 #   Table S2 - Sample numbers in cotyledon
 #   Table S3 - Comparison of ime-series data in leaves
@@ -90,7 +90,7 @@ def main():
     
     
     ###############################
-    ########## Figure S2 ##########
+    ########## Figure S1 ##########
     ###############################  
     
     tableDensities = pd.DataFrame(columns=['Filament', 'Replicate', 'CellNumber', 'Mask', 'Density', 'DensityCell', 'Area [µm2]', 'Completeness', 'NodeIdx', 'NodeType', 'length=5', 'length=10', 'length=15', 'length=20', 'length=25', 'length=30', 'length=35','length=40', 'length=45', 'length=50'])
@@ -271,7 +271,7 @@ def main():
     ax[1, 2].set_ylim([0.05, 0.7])
     ax[0, 0].legend()
     plt.tight_layout()
-    fig.savefig(pathPlotsSupplementary / 'FigureS2_SyntheticPCs_OptimalDensityMasks.png', bbox_inches='tight', dpi=300)
+    fig.savefig(pathPlotsSupplementary / 'FigureS1_SyntheticPCs_OptimalDensityMasks.png', bbox_inches='tight', dpi=300)
     plt.close()
     
     ### statistics
@@ -291,18 +291,18 @@ def main():
                 pValues.loc[len(pValues)] = dataAppend
     
     
-    tableFigS2 = Table(title='P-values for different density mask sizes in lobe and neck regions')
+    tableFigS1 = Table(title='P-values for different density mask sizes in lobe and neck regions')
     for col in pValues.columns:
-        tableFigS2.add_column(str(col))
+        tableFigS1.add_column(str(col))
     for _, row in pValues.iterrows():
-        tableFigS2.add_row(*[str(v) for v in row])
+        tableFigS1.add_row(*[str(v) for v in row])
 
-    console.print('[bold blue]Supplementary Figure 2[/bold blue]')
-    console.print(tableFigS2)
+    console.print('[bold blue]Supplementary Figure 1[/bold blue]')
+    console.print(tableFigS1)
     
     
     ###############################
-    ########## Figure S3 ##########
+    ########## Figure S2 ##########
     ###############################   
     colors = ['#2ca02c', '#2ca02c', '#e377c2', '#e377c2']
     hatches = ['', '/', '', '/']
@@ -446,21 +446,21 @@ def main():
         box.set_edgecolor('black')    
         box.set_alpha(1)                 
     plt.tight_layout()
-    fig.savefig(pathPlotsSupplementary / 'FigureS3_Cotyledons_CytoskeletonDensityMasks_WT_Mutant.png', bbox_inches='tight', dpi=300)
+    fig.savefig(pathPlotsSupplementary / 'FigureS2_Cotyledons_CytoskeletonDensityMasks_WT_Mutant.png', bbox_inches='tight', dpi=300)
     plt.close()    
     
-    tableFigS3 = Table(title='P-values for different mask approaches of AF and MT in lobes and necks')
-    tableFigS3.add_column('', justify='left')
-    tableFigS3.add_column('Perpendicular mask', justify='center')
-    tableFigS3.add_column('', justify='center')
-    tableFigS3.add_column('Circular mask', justify='center')
-    tableFigS3.add_column('', justify='center')
-    tableFigS3.add_column('Polygonal mask', justify='center')
-    tableFigS3.add_column('', justify='center')
+    tableFigS2 = Table(title='P-values for different mask approaches of AF and MT in lobes and necks')
+    tableFigS2.add_column('', justify='left')
+    tableFigS2.add_column('Perpendicular mask', justify='center')
+    tableFigS2.add_column('', justify='center')
+    tableFigS2.add_column('Circular mask', justify='center')
+    tableFigS2.add_column('', justify='center')
+    tableFigS2.add_column('Polygonal mask', justify='center')
+    tableFigS2.add_column('', justify='center')
     
-    tableFigS3.add_row('', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]')
+    tableFigS2.add_row('', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]')
     
-    tableFigS3.add_row('AF density', 
+    tableFigS2.add_row('AF density', 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesR, 'WT', 'AFs', 'lobe'), extract_cell_data(localDensitiesC, 'WT', 'AFs', 'neck'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesR, 'act2-1act7-1', 'AFs', 'lobe'), extract_cell_data(localDensitiesC, 'act2-1act7-1', 'AFs', 'neck'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesC, 'WT', 'AFs', 'lobe'), extract_cell_data(localDensitiesC, 'WT', 'AFs', 'neck'))[1], '.2e')), 
@@ -468,7 +468,7 @@ def main():
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesP, 'WT', 'AFs', 'outside'), extract_cell_data(localDensitiesP, 'WT', 'AFs', 'inside'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesP, 'act2-1act7-1', 'AFs', 'outside'), extract_cell_data(localDensitiesP, 'act2-1act7-1', 'AFs', 'inside'))[1], '.2e')))
     
-    tableFigS3.add_row('MT density', 
+    tableFigS2.add_row('MT density', 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesR, 'WT', 'MTs', 'lobe'), extract_cell_data(localDensitiesC, 'WT', 'MTs', 'neck'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesR, 'act2-1act7-1', 'MTs', 'lobe'), extract_cell_data(localDensitiesC, 'act2-1act7-1', 'MTs', 'neck'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesC, 'WT', 'MTs', 'lobe'), extract_cell_data(localDensitiesC, 'WT', 'MTs', 'neck'))[1], '.2e')), 
@@ -476,10 +476,10 @@ def main():
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesP, 'WT', 'MTs', 'outside'), extract_cell_data(localDensitiesP, 'WT', 'MTs', 'inside'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesP, 'act2-1act7-1', 'MTs', 'outside'), extract_cell_data(localDensitiesP, 'act2-1act7-1', 'MTs', 'inside'))[1], '.2e')))
     
-    tableFigS3.add_row('', '', '', '', '', '', '')
-    tableFigS3.add_row('', '[blue]AF[/blue]', '[blue]MT[/blue]', '[blue]AF[/blue]', '[blue]MT[/blue]', '[blue]AF[/blue]', '[blue]MT[/blue]')
+    tableFigS2.add_row('', '', '', '', '', '', '')
+    tableFigS2.add_row('', '[blue]AF[/blue]', '[blue]MT[/blue]', '[blue]AF[/blue]', '[blue]MT[/blue]', '[blue]AF[/blue]', '[blue]MT[/blue]')
     
-    tableFigS3.add_row('Cytoskeleton density (lobes/necks)', 
+    tableFigS2.add_row('Cytoskeleton density (lobes/necks)', 
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesR[(localDensitiesR['Genotype'] =='WT') & (localDensitiesR['Filament'] == 'AFs')], 'perp')[0], extract_ratio_from_df(localDensitiesR[(localDensitiesR['Genotype'] =='act2-1act7-1') & (localDensitiesR['Filament'] == 'AFs')], 'perp')[0])[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesR[(localDensitiesR['Genotype'] =='WT') & (localDensitiesR['Filament'] == 'MTs')], 'perp')[0], extract_ratio_from_df(localDensitiesR[(localDensitiesR['Genotype'] =='act2-1act7-1') & (localDensitiesR['Filament'] == 'MTs')], 'perp')[0])[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesC[(localDensitiesC['Genotype'] =='WT') & (localDensitiesC['Filament'] == 'AFs')], 'circ')[0], extract_ratio_from_df(localDensitiesC[(localDensitiesC['Genotype'] =='act2-1act7-1') & (localDensitiesC['Filament'] == 'AFs')], 'circ')[0])[1], '.2e')), 
@@ -487,12 +487,12 @@ def main():
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesP[(localDensitiesP['Genotype'] =='WT') & (localDensitiesP['Filament'] == 'AFs')], 'poly')[0], extract_ratio_from_df(localDensitiesP[(localDensitiesP['Genotype'] =='act2-1act7-1') & (localDensitiesP['Filament'] == 'AFs')], 'poly')[0])[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesP[(localDensitiesP['Genotype'] =='WT') & (localDensitiesP['Filament'] == 'MTs')], 'poly')[0], extract_ratio_from_df(localDensitiesP[(localDensitiesP['Genotype'] =='act2-1act7-1') & (localDensitiesP['Filament'] == 'MTs')], 'poly')[0])[1], '.2e')))
     
-    console.print('[bold blue]Supplementary Figure 3[/bold blue]')
-    console.print(tableFigS3)
+    console.print('[bold blue]Supplementary Figure 2[/bold blue]')
+    console.print(tableFigS2)
 
     
     ###############################
-    ########## Figure S4 ##########
+    ########## Figure S3 ##########
     ###############################  
 
     filaments = ['AFs', 'MTs']
@@ -519,12 +519,12 @@ def main():
                     ax.text(-0.05, 0.5, fil + ' - ' + rep, transform=ax.transAxes, rotation=90, va='center', ha='right')
                 idx += 1
     plt.tight_layout()               
-    fig.savefig(pathPlotsSupplementary / 'FigureS4_ExtractedCells_WT.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS3_ExtractedCells_WT.png', bbox_inches='tight', dpi=300)               
     plt.close()
     
     
     ###############################
-    ########## Figure S5 ##########
+    ########## Figure S4 ##########
     ###############################  
 
     ### act2-1act7-1
@@ -548,12 +548,12 @@ def main():
                     ax.text(-0.05, 0.5, fil + ' - ' + rep, transform=ax.transAxes, rotation=90, va='center', ha='right')
                 idx += 1
     plt.tight_layout()               
-    fig.savefig(pathPlotsSupplementary / 'FigureS5_ExtractedCells_act2-1act7-1.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS4_ExtractedCells_act2-1act7-1.png', bbox_inches='tight', dpi=300)               
     plt.close()
     
     
     ###############################
-    ########## Figure S6 ##########
+    ########## Figure S5 ##########
     ###############################  
     
     ### create heatmaps of relative completeness in leaves for WT and act2-1act7-1
@@ -571,10 +571,10 @@ def main():
         for idx, tp in enumerate(cells[gt].keys()):
             if gt == 'WT':
                 resolution = 1 / 10.9051
-                name = 'FigureS6A_Leaves_LobeynessHeatmap_WT.png'
+                name = 'FigureS5A_Leaves_LobeynessHeatmap_WT.png'
             else:
                 resolution = 1 / 6.5445
-                name = 'FigureS6B_Leaves_LobeynessHeatmap_Mutant.png'
+                name = 'FigureS5B_Leaves_LobeynessHeatmap_Mutant.png'
             imageDilated, labeledImageSelected, labelsSelected = extract_selected_cells(cells, gt, tp, pathLeaves)    
             lobeyness = extract_selected_cell_properties(labeledImageSelected, labelsSelected, resolution, 'lobeyness')
              
@@ -659,11 +659,11 @@ def main():
         yvalM = ax[i].lines[3].get_ydata()[np.where(np.round(ax[i].lines[3].get_xdata(), 2) == np.around(meanM, 2))[0][0]]
         ax[i].plot([meanWT, meanWT], [ymin, yvalWT], color='gray', ls='-', zorder=200)
         ax[i].plot([meanM, meanM], [ymin, yvalM], color='gray', ls='--', zorder=200)
-    fig.savefig(pathPlotsSupplementary / 'FigureS6C_Leaves_LobeynessDistributions_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS5C_Leaves_LobeynessDistributions_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()
     
     # statistics
-    console.print('[bold blue]Supplementary Figure 6[/bold blue]')
+    console.print('[bold blue]Supplementary Figure 5[/bold blue]')
     print('Lobeyness (WT vs. M): \n...0h:', sp.stats.mannwhitneyu(dataLobeynessWT[0], dataLobeynessM[0])[1], '\n...12h:', sp.stats.mannwhitneyu(dataLobeynessWT[1], dataLobeynessM[1])[1], '\n...24h:', sp.stats.mannwhitneyu(dataLobeynessWT[2], dataLobeynessM[2])[1], '\n...36h:', sp.stats.mannwhitneyu(dataLobeynessWT[3], dataLobeynessM[3])[1])
     
     
@@ -683,7 +683,7 @@ def main():
     plt.errorbar([dataLobesM[idx].mean() for idx in range(4)], [dataLobeynessM[idx].mean() for idx in range(4)], yerr=[[dataLobeynessM[idx].mean() - dataLobeynessM[idx].quantile(q=0.25) for idx in range(4)], [dataLobeynessM[idx].quantile(q=0.75) - dataLobeynessM[idx].mean() for idx in range(4)]], xerr=[[dataLobesM[idx].mean() - dataLobesM[idx].quantile(q=0.25) for idx in range(4)], [dataLobesM[idx].quantile(q=0.75) - dataLobesM[idx].mean() for idx in range(4)]], fmt = 'o', color = 'gold', linewidth=2, capsize=3, alpha=0.5)
     ax.set_ylabel('Lobeyness')
     ax.set_xlabel('Number of true lobes')
-    fig.savefig(pathPlotsSupplementary / 'FigureS6D_Leaves_LobeynessLobes_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS5D_Leaves_LobeynessLobes_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()
 
     # statistical significance (Hotelling's T2 test)
@@ -715,12 +715,12 @@ def main():
     ax.set_ylabel('Lobeyness')
     ax.set_xlabel('log(Area_sc)')
     plt.legend()
-    fig.savefig(pathPlotsSupplementary / 'FigureS6E_Leaves_LobeynessArea_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS5E_Leaves_LobeynessArea_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()   
     
     
     ###############################
-    ########## Figure S7 ##########
+    ########## Figure S6 ##########
     ###############################
 
     ### calculate AGR and RGR from selected cell areas
@@ -860,7 +860,7 @@ def main():
     cbarR = fig.colorbar(imR, ax=ax[1, 3], fraction=0.046, pad=0.04)
     cbarR.set_label('Relative growth rate [h^-1]', rotation=90, labelpad=20)    
     plt.tight_layout()
-    fig.savefig(pathPlotsSupplementary / 'FigureS7AB_Leaves_AGR_RGR_Heatmaps_WT_Mutant.png', bbox_inches='tight', dpi=300) 
+    fig.savefig(pathPlotsSupplementary / 'FigureS6AB_Leaves_AGR_RGR_Heatmaps_WT_Mutant.png', bbox_inches='tight', dpi=300) 
     plt.close()
         
     #######
@@ -915,11 +915,11 @@ def main():
         box.set_alpha(1)
     ax[1].set_ylabel('Relative growth rate [h^-1]')
     ax[1].set_ylim(0.01, 0.06)
-    fig.savefig(pathPlotsSupplementary / 'FigureS7C_Leaves_AGR_RGR_Boxplots_WT_Mutant.png', bbox_inches='tight', dpi=300)
+    fig.savefig(pathPlotsSupplementary / 'FigureS6C_Leaves_AGR_RGR_Boxplots_WT_Mutant.png', bbox_inches='tight', dpi=300)
     plt.close()
 
     # statistical test
-    console.print('[bold blue]Supplementary Figure 7[/bold blue]')
+    console.print('[bold blue]Supplementary Figure 6[/bold blue]')
     print('\nAbsolute growth rate')
     print('...P-value (0-24h):', sp.stats.ttest_ind(agr0_24['WT'], agr0_24['act2-1act7-1'])[1])
     print('...P-value (12-36h):', sp.stats.ttest_ind(agr12_36['WT'], agr12_36['act2-1act7-1'])[1])
