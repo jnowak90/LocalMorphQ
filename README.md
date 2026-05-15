@@ -105,7 +105,7 @@ python main.py --data data/ExampleData/ --config config/config_Example.yaml
 
 This will generate the processed output files required for figure reproduction.
 
-To replicate the data provided in the study, first download the data from [Zenodo](https://zenodo.org/records/20138601). Unzip the DataPCs folder and copy into the data/ folder of LocalMorphQ. Copy the config files (<em>config_Cotyledons.yaml</em>, <em>config_Leaves.yaml</em>) into the config/ folder of LocalMorphQ.
+To replicate the data provided in the study, first download the data from [Zenodo](https://zenodo.org/records/20138601). Unzip the <em>DataPCs.zip</em> folder and copy into the data/ folder of LocalMorphQ. Copy the config files (<em>config_Cotyledons.yaml</em>, <em>config_Leaves.yaml</em>) into the config/ folder of LocalMorphQ.
 
 Then, use:
 ```bash
