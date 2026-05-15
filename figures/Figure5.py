@@ -30,7 +30,7 @@ import src.GraVisExtraction as GE
 ###############################################################################
 
 # =========================
-# Figure 4
+# Figure 5
 #  Time-resolved analysis of pavement cell shape complexity in developing leaves of wild-type
 #  and act2-1 act7-1 plants.
 # =========================
@@ -70,10 +70,10 @@ def main():
         for idx, tp in enumerate(cells[gt].keys()):
             if gt == 'WT':
                 resolution = 1 / 10.9051
-                name = 'Figure4A_Leaves_ComplexityHeatmap_WT.png'
+                name = 'Figure5A_Leaves_ComplexityHeatmap_WT.png'
             else:
                 resolution = 1 / 6.5445
-                name = 'Figure4B_Leaves_ComplexityHeatmap_Mutant.png'
+                name = 'Figure5B_Leaves_ComplexityHeatmap_Mutant.png'
             imageDilated, labeledImageSelected, labelsSelected = extract_selected_cells(cells, gt, tp, pathLeaves)    
             completeness = extract_selected_cell_properties(labeledImageSelected, labelsSelected, resolution, 'completeness')
 
@@ -161,7 +161,7 @@ def main():
         yvalM = ax[i].lines[3].get_ydata()[np.where(np.round(ax[i].lines[3].get_xdata(), 2) == np.around(meanM, 2))[0][0]]
         ax[i].plot([meanWT, meanWT], [ymin, yvalWT], color='gray', ls='-', zorder=200)
         ax[i].plot([meanM, meanM], [ymin, yvalM], color='gray', ls='--', zorder=200)
-    fig.savefig(pathPlots / 'Figure4C_Leaves_ShapeComplexityDistributions_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlots / 'Figure5C_Leaves_ShapeComplexityDistributions_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()
     
     # statistics
@@ -184,7 +184,7 @@ def main():
     plt.errorbar([dataLobesM[idx].mean() for idx in range(4)], [dataCompletenessM[idx].mean() for idx in range(4)], yerr=[[dataCompletenessM[idx].mean() - dataCompletenessM[idx].quantile(q=0.25) for idx in range(4)], [dataCompletenessM[idx].quantile(q=0.75) - dataCompletenessM[idx].mean() for idx in range(4)]], xerr=[[dataLobesM[idx].mean() - dataLobesM[idx].quantile(q=0.25) for idx in range(4)], [dataLobesM[idx].quantile(q=0.75) - dataLobesM[idx].mean() for idx in range(4)]], fmt = 'o', color = 'gold', linewidth=2, capsize=3, alpha=0.5)
     ax.set_ylabel('PC shape complexity')
     ax.set_xlabel('Number of true lobes')
-    fig.savefig(pathPlots / 'Figure4D_Leaves_ShapeComplexityLobes_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlots / 'Figure5D_Leaves_ShapeComplexityLobes_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()
 
     # statistical significance (Hotelling's T2 test)
@@ -216,7 +216,7 @@ def main():
     ax.set_ylabel('PC shape complexity')
     ax.set_xlabel('log(Area_sc)')
     plt.legend()
-    fig.savefig(pathPlots / 'Figure4E_Leaves_ShapeComplexityArea_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlots / 'Figure5E_Leaves_ShapeComplexityArea_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()    
  
     
