@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 ###############################################################################
 # =========================
-# Figure 2
+# Figure 3
 # Visualization of actin cytoskeleton organization in cotyledon pavement cells in wild-type and
 # the act2-1 act7-1 mutant.
 # =========================
@@ -93,7 +93,7 @@ def main():
         box.set(hatch=hatches[idx])
         box.set_alpha(0.75)
     fig.tight_layout()
-    fig.savefig(pathPlots / 'Figure2C-F_Cotyledons_CytoskeletonDensity_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlots / 'Figure3C-F_Cotyledons_CytoskeletonDensity_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()
     
     
