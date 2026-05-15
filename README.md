@@ -71,10 +71,10 @@ pip install -r requirements.txt
 │       └── MTs/
 |
 └── figures/
-    ├── Figure1.py
     ├── Figure2.py
     ├── Figure3.py
     ├── Figure4.py
+    ├── Figure5.py
     └── FiguresSupplementary.py
 ```
 
@@ -105,7 +105,7 @@ python main.py --data data/ExampleData/ --config config/config_Example.yaml
 
 This will generate the processed output files required for figure reproduction.
 
-To replicate the data provided in the study, first download the data from Zenodo and save DataPCs folder in the data/ folder. Copy the config files into the config/ folder.
+To replicate the data provided in the study, first download the data from [Zenodo](10.5281/zenodo.20138600). Unzip the DataPCs folder and copy into the data/ folder of LocalMorphQ. Copy the config files (<em>config_Cotyledons.yaml</em>, <em>config_Leaves.yaml</e,>) into the config/ folder of LocalMorphQ.
 
 Then, use:
 ```bash
@@ -118,11 +118,11 @@ python main.py --data data/DataPCs/Leaves/ --config config/config_Leaves.yaml
 Each figure script takes the path to the processed data folder as input. Run them individually:
 
 ```bash
-python figures/Figure1.py --data data/DataPCs/
 python figures/Figure2.py --data data/DataPCs/
-python figures/Figure3.py --data data/DataPCs
-python figures/Figure4.py --data data/DataPCs
-python figures/FigureSupplementary.py --data data/DataPCs
+python figures/Figure3.py --data data/DataPCs/
+python figures/Figure4.py --data data/DataPCs/
+python figures/Figure5.py --data data/DataPCs/
+python figures/FigureSupplementary.py --data data/DataPCs/
 ```
 
 Figures will be saved to a separate 'Plots' folder, Supplementary Figures will be saved in a 'Supplementary' subfolder.
