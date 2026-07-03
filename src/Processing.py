@@ -17,7 +17,7 @@ import ast
 # add current script directory to path
 pathScript = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(pathScript))
-import Utils as ASU
+from . import Utils as ASU
 
 ###############################################################################
 def process_images(config, pathData):
