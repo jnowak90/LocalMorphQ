@@ -34,7 +34,7 @@ import matplotlib.pyplot as plt
 # add current script directory to path
 pathScript = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(pathScript))
-import GraVisUtils as utils
+from . import GraVisUtils as utils
 
 class HandlerEllipse(HandlerPatch):
     def create_artists(self, legend, orig_handle,
