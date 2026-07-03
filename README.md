@@ -84,7 +84,7 @@ pip install -r requirements.txt
 
 ### Step 1 — Process the data
 
-Run `main.py` with the path to your data folder and your config file:
+No additional packages have to be installed. The repository includes all scripts for the extraction of cytoskeletal filaments (CytoSeg) and the segmentation and analysis of pavement cells (GraVis) in the src/ folder. Run `main.py` with the path to your data folder and your config file:
 
 ```bash
 python main.py --data /path/to/data --config /path/to/config.yaml
