@@ -285,9 +285,15 @@ def main():
                 data = pd.DataFrame({'Values': pd.concat([tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'lobe')]['length=' + str(m)], tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'neck')]['length=' + str(m)], tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'none')]['length=' + str(m)]]),
                                      'Group': (['lobe'] * len(tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'lobe')]['length=' + str(m)]) + ['neck'] * len(tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'neck')]['length=' + str(m)]) + ['none'] * len(tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'none')]['length=' + str(m)]))})
                
-                aov = pg.anova(data=data, dv='Values', between='Group')['p-unc'].values[0]
-                tests = pg.pairwise_tests(data=data, dv='Values', between='Group', padjust='bonf')[ 'p-corr'].values
-                dataAppend = [mask, d, m, format(aov, '.2e'), format(tests[0], '.2e'), format(tests[1], '.2e'), format(tests[2], '.2e')]
+                eval_var = pg.homoscedasticity(data=data, dv='Values', group='Group')['equal_var'].iloc[0]
+                if eval_var:
+                    aov = pg.anova(data=data, dv='Values', between='Group')['p-unc'].values[0]
+                    posthoc = pg.pairwise_tukey(data=data, dv='Values', between='Group')['p-tukey'].values
+                else:
+                    aov = pg.welch_anova(data=data, dv='Values', between='Group')['p-unc'].values[0]
+                    posthoc = pg.pairwise_gameshowell(data=data, dv='Values', between='Group')[ 'pval'].values
+
+                dataAppend = [mask, d, m, format(aov, '.2e'), format(posthoc[0], '.2e'), format(posthoc[1], '.2e'), format(posthoc[2], '.2e')]
                 pValues.loc[len(pValues)] = dataAppend
     
     
