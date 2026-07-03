@@ -30,17 +30,16 @@ from rich.console import Console
 pathScript = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(pathScript))
 import src.GraVisExtraction as GE
-import scr.Utils as ASU
+import src.Utils as ASU
 
 ###############################################################################
 # =========================
 # Supplememtary Figures
-#   Figure S1 - Optimal mask size
-#   Figure S2 - Different mask approaches for cytoskeleton analysis (cotyledon)
-#   Figure S3 - Segmentation of wild-type leaves
-#   Figure S4 - Segmentation of act2-1act7-1 leaves
-#   Figure S5 - Time-series analysis of lobeyness (leaves)
-#   Figure S6 - Growth rate analysis (leaves)
+#   Figure S1 - Different mask approaches for cytoskeleton analysis (cotyledon)
+#   Figure S2 - Segmentation of wild-type leaves
+#   Figure S3 - Segmentation of act2-1act7-1 leaves
+#   Figure S4 - Time-series analysis of lobeyness (leaves)
+#   Figure S5 - Growth rate analysis (leaves)
 #   Table S1 - Cytoskeletal denisties of different masks (cotyledon)
 #   Table S2 - Sample numbers in cotyledon
 #   Table S3 - Comparison of ime-series data in leaves
@@ -87,228 +86,11 @@ def main():
     
     cmapBinary = matplotlib.colors.ListedColormap([[0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 1.0]])
     cmapBinaryRed = matplotlib.colors.ListedColormap([[0.0, 0.0, 0.0, 0.0], [1.0, 0.0, 0.0, 1.0]]) # red
+    console = Console()
     
-    
+   
     ###############################
     ########## Figure S1 ##########
-    ###############################  
-    
-    tableDensities = pd.DataFrame(columns=['Filament', 'Replicate', 'CellNumber', 'Mask', 'Density', 'DensityCell', 'Area [µm2]', 'Completeness', 'NodeIdx', 'NodeType', 'length=5', 'length=10', 'length=15', 'length=20', 'length=25', 'length=30', 'length=35','length=40', 'length=45', 'length=50'])
-    maskSizes = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-    cytoskeleton = ['MTs', 'AFs', 'AFs', 'MTs', 'MTs', 'AFs', 'MTs', 'AFs', 'AFs', 'AFs']
-    replicates = ['R1', 'R2', 'R1', 'R1', 'R1', 'R1', 'R2', 'R1', 'R1', 'R2']
-    cellnumbers = [19, 15, 58, 8, 17, 13, 19, 56, 29, 1]
-    resolutions = [1/10.9051, 1/6.5445, 1/6.5445, 1/10.9051, 1/10.9051, 1/6.5445, 1/10.9051, 1/6.5445, 1/6.5445, 1/6.5445]
-
-    for idx in range(10):
-        densityEqual = skimage.io.imread(pathRoot / 'SyntheticPCs' / 'EqualDensity' / (str(idx + 1) + '_equalDensity.png'))
-        densityLobe = skimage.io.imread(pathRoot / 'SyntheticPCs' / 'LobeDensity' /  (str(idx + 1) + '_lobeDensity.png'))
-        densityNeck = skimage.io.imread(pathRoot / 'SyntheticPCs' / 'NeckDensity' / (str(idx + 1) + '_neckDensity.png'))
-        resolution = resolutions[idx] 
-            
-        # create visGraph
-        cellImage = (densityEqual == 127) * 1 
-        coordsContour = np.transpose(np.where(cellImage == 1))
-        cellImage = sp.ndimage.binary_fill_holes(cellImage)
-        for x, y in coordsContour:
-            cellImage[x, y] = 0
-        visGraph, cellContour = GE.create_visibility_graph(cellImage * 1, 1, resolution)
-        
-        # prepare density images (int32, background = -2, interior = 2)
-        densityEqualFiltered = (densityEqual.astype(np.int32).copy() * 0) - 2
-        densityLobeFiltered = (densityLobe.astype(np.int32).copy() * 0) - 2
-        densityNeckFiltered = (densityNeck.astype(np.int32).copy() * 0) - 2
-        coordsCellInterior = np.transpose(np.where(cellImage == 1))
-        for x, y in coordsCellInterior:
-            if densityEqual[x, y] == 255:
-                densityEqualFiltered[x, y] = 2
-            else:
-                densityEqualFiltered[x, y] = 0
-            if densityLobe[x, y] == 255:
-                densityLobeFiltered[x, y] = 2
-            else:
-                densityLobeFiltered[x, y] = 0
-            if densityNeck[x, y] == 255:
-                densityNeckFiltered[x, y] = 2
-            else:
-                densityNeckFiltered[x, y] = 0
-        
-        # calculate shape properties
-        cellDensity = np.sum(densityEqual == 255) / np.sum(cellImage)
-        completeness = GE.compute_graph_complexity(visGraph)
-        area = np.sum(cellImage) * (resolution ** 2)      
-
-        # calculate lobe and neck positions
-        lobes, necks = GE.count_lobes_and_necks(visGraph)
-        lobePos = get_lobe_neck_positions(visGraph)[0]
-        neckPos = get_lobe_neck_positions(visGraph)[1]
-        pos = nx.get_node_attributes(visGraph, 'pos')
-        for node in pos.keys():
-            if node in lobePos.keys():
-                nodeType = 'lobe'
-            elif node in neckPos.keys():
-                nodeType = 'neck'
-            else:
-                nodeType = 'none'
-                
-            ### perpendicular mask
-            # equal density
-            densityPerpEqual = [ASU.calculate_density(densityEqualFiltered, node, pos, visGraph, length, 10, 0, 'perpendicular') for length in maskSizes]         
-            dataAppendPerpEqual = [cytoskeleton[idx], replicates[idx], cellnumbers[idx], 'perpendicular', 'equal', cellDensity, area, completeness, node, nodeType]
-            dataAppendPerpEqual.extend(densityPerpEqual)
-            tableDensities.loc[len(tableDensities)] = dataAppendPerpEqual
-            # lobe-centered density
-            densityPerpLobe = [ASU.calculate_density(densityLobeFiltered, node, pos, visGraph, length, 10, 0, 'perpendicular') for length in maskSizes]
-            dataAppendPerpLobe = [cytoskeleton[idx], replicates[idx], cellnumbers[idx], 'perpendicular', 'lobe', cellDensity, area, completeness, node, nodeType]
-            dataAppendPerpLobe.extend(densityPerpLobe)
-            tableDensities.loc[len(tableDensities)] = dataAppendPerpLobe
-            # neck-centered density
-            densityPerpNeck = [ASU.calculate_density(densityNeckFiltered, node, pos, visGraph, length, 10, 0, 'perpendicular') for length in maskSizes]
-            dataAppendPerpNeck = [cytoskeleton[idx], replicates[idx], cellnumbers[idx], 'perpendicular', 'neck', cellDensity, area, completeness, node, nodeType]
-            dataAppendPerpNeck.extend(densityPerpNeck)
-            tableDensities.loc[len(tableDensities)] = dataAppendPerpNeck
-            
-            ### circular mask
-            # equal density
-            densityCircEqual = [ASU.calculate_density(densityEqualFiltered, node, pos, visGraph, length, 0, 0, 'circular') for length in maskSizes]
-            dataAppendCircEqual = [cytoskeleton[idx], replicates[idx], cellnumbers[idx], 'circular', 'equal', cellDensity, area, completeness, node, nodeType]
-            dataAppendCircEqual.extend(densityCircEqual)
-            tableDensities.loc[len(tableDensities)] = dataAppendCircEqual
-            # lobe-centered density
-            densityCircLobe = [ASU.calculate_density(densityLobeFiltered, node, pos, visGraph, length, 0, 0, 'circular') for length in maskSizes]
-            dataAppendCircLobe = [cytoskeleton[idx], replicates[idx], cellnumbers[idx], 'circular', 'lobe', cellDensity, area, completeness, node, nodeType]
-            dataAppendCircLobe.extend(densityCircLobe)
-            tableDensities.loc[len(tableDensities)] = dataAppendCircLobe
-            # neck-centered density
-            densityCircNeck = [ASU.calculate_density(densityNeckFiltered, node, pos, visGraph,  length, 0, 0, 'circular') for length in maskSizes]
-            dataAppendCircNeck = [cytoskeleton[idx], replicates[idx], cellnumbers[idx], 'circular', 'neck', cellDensity, area, completeness, node, nodeType]
-            dataAppendCircNeck.extend(densityCircNeck)
-            tableDensities.loc[len(tableDensities)] = dataAppendCircNeck
-    tableDensities.to_csv(pathPlotsSupplementary / 'OptimalMaskSizes.csv', index=None)
-
-    ### plot mask densities
-    densitiesLobesPerp = tableDensities[(tableDensities['NodeType'] == 'lobe') & (tableDensities['Mask'] == 'perpendicular')]  
-    densitiesNecksPerp = tableDensities[(tableDensities['NodeType'] == 'neck') & (tableDensities['Mask'] == 'perpendicular')]  
-    densitiesNonePerp = tableDensities[(tableDensities['NodeType'] == 'none') & (tableDensities['Mask'] == 'perpendicular')]   
-    densitiesLobesCirc = tableDensities[(tableDensities['NodeType'] == 'lobe') & (tableDensities['Mask'] == 'circular')]  
-    densitiesNecksCirc = tableDensities[(tableDensities['NodeType'] == 'neck') & (tableDensities['Mask'] == 'circular')]  
-    densitiesNoneCirc = tableDensities[(tableDensities['NodeType'] == 'none') & (tableDensities['Mask'] == 'circular')] 
-            
-    fig, ax = plt.subplots(2, 3, figsize=(12, 12))
-    ### perpendicular mask
-    # equal distribution
-    ax[0, 0].scatter(maskSizes, [densitiesLobesPerp[densitiesLobesPerp['Density'] == 'equal'].iloc[:, -10:].mean().values][0], c='darkorange')
-    ax[0, 0].errorbar(maskSizes, [densitiesLobesPerp[densitiesLobesPerp['Density'] == 'equal'].iloc[:, -10:].mean().values][0], yerr=[densitiesLobesPerp[densitiesLobesPerp['Density'] == 'equal'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'darkorange', linewidth=2, capsize=3, alpha=0.5, label='lobes')
-    ax[0, 0].scatter(maskSizes, [densitiesNecksPerp[densitiesNecksPerp['Density'] == 'equal'].iloc[:, -10:].mean().values][0], c='cornflowerblue')
-    ax[0, 0].errorbar(maskSizes, [densitiesNecksPerp[densitiesNecksPerp['Density'] == 'equal'].iloc[:, -10:].mean().values][0], yerr=[densitiesNecksPerp[densitiesNecksPerp['Density'] == 'equal'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'cornflowerblue', linewidth=2, capsize=3, alpha=0.5, label='necks')
-    ax[0, 0].scatter(maskSizes, [densitiesNonePerp[densitiesNonePerp['Density'] == 'equal'].iloc[:, -10:].mean().values][0], c='seagreen', alpha=0.25)
-    ax[0, 0].errorbar(maskSizes, [densitiesNonePerp[densitiesNonePerp['Density'] == 'equal'].iloc[:, -10:].mean().values][0], yerr=[densitiesNonePerp[densitiesNonePerp['Density'] == 'equal'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'seagreen', linewidth=2, capsize=3, alpha=0.25, label='none')
-    ax[0, 0].set_ylabel('Density')
-    ax[0, 0].set_xlabel('Mask length')
-    ax[0, 0].set_xticks(maskSizes)
-    ax[0, 0].set_xticklabels(maskSizes)
-    # lobe-centered distribution
-    ax[0, 1].scatter(maskSizes, [densitiesLobesPerp[densitiesLobesPerp['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], c='darkorange')
-    ax[0, 1].errorbar(maskSizes, [densitiesLobesPerp[densitiesLobesPerp['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], yerr=[densitiesLobesPerp[densitiesLobesPerp['Density'] == 'lobe'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'darkorange', linewidth=2, capsize=3, alpha=0.5, label='lobes')
-    ax[0, 1].scatter(maskSizes, [densitiesNecksPerp[densitiesNecksPerp['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], c='cornflowerblue')
-    ax[0, 1].errorbar(maskSizes, [densitiesNecksPerp[densitiesNecksPerp['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], yerr=[densitiesNecksPerp[densitiesNecksPerp['Density'] == 'lobe'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'cornflowerblue', linewidth=2, capsize=3, alpha=0.5, label='necks')
-    ax[0, 1].scatter(maskSizes, [densitiesNonePerp[densitiesNonePerp['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], c='seagreen', alpha=0.25)
-    ax[0, 1].errorbar(maskSizes, [densitiesNonePerp[densitiesNonePerp['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], yerr=[densitiesNonePerp[densitiesNonePerp['Density'] == 'lobe'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'seagreen', linewidth=2, capsize=3, alpha=0.25, label='none')
-    ax[0, 1].set_ylabel('Density')
-    ax[0, 1].set_xlabel('Mask length')
-    ax[0, 1].set_xticks(maskSizes)
-    ax[0, 1].set_xticklabels(maskSizes)
-    # neck-centered distribution
-    ax[0, 2].scatter(maskSizes, [densitiesLobesPerp[densitiesLobesPerp['Density'] == 'neck'].iloc[:, -10:].mean().values][0], c='darkorange')
-    ax[0, 2].errorbar(maskSizes, [densitiesLobesPerp[densitiesLobesPerp['Density'] == 'neck'].iloc[:, -10:].mean().values][0], yerr=[densitiesLobesPerp[densitiesLobesPerp['Density'] == 'neck'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'darkorange', linewidth=2, capsize=3, alpha=0.5, label='lobes')
-    ax[0, 2].scatter(maskSizes, [densitiesNecksPerp[densitiesNecksPerp['Density'] == 'neck'].iloc[:, -10:].mean().values][0], c='cornflowerblue')
-    ax[0, 2].errorbar(maskSizes, [densitiesNecksPerp[densitiesNecksPerp['Density'] == 'neck'].iloc[:, -10:].mean().values][0], yerr=[densitiesNecksPerp[densitiesNecksPerp['Density'] == 'neck'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'cornflowerblue', linewidth=2, capsize=3, alpha=0.5, label='necks')
-    ax[0, 2].scatter(maskSizes, [densitiesNonePerp[densitiesNonePerp['Density'] == 'neck'].iloc[:, -10:].mean().values][0], c='seagreen', alpha=0.25)
-    ax[0, 2].errorbar(maskSizes, [densitiesNonePerp[densitiesNonePerp['Density'] == 'neck'].iloc[:, -10:].mean().values][0], yerr=[densitiesNonePerp[densitiesNonePerp['Density'] == 'neck'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'seagreen', linewidth=2, capsize=3, alpha=0.25, label='none')
-    ax[0, 2].set_ylabel('Density')
-    ax[0, 2].set_xlabel('Mask length')
-    ax[0, 2].set_xticks(maskSizes)
-    ax[0, 2].set_xticklabels(maskSizes)
-    ### circular mask
-    # equal distribution
-    ax[1, 0].scatter(maskSizes, [densitiesLobesCirc[densitiesLobesCirc['Density'] == 'equal'].iloc[:, -10:].mean().values][0], c='darkorange')
-    ax[1, 0].errorbar(maskSizes, [densitiesLobesCirc[densitiesLobesCirc['Density'] == 'equal'].iloc[:, -10:].mean().values][0], yerr=[densitiesLobesCirc[densitiesLobesCirc['Density'] == 'equal'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'darkorange', linewidth=2, capsize=3, alpha=0.5, label='lobes')
-    ax[1, 0].scatter(maskSizes, [densitiesNecksCirc[densitiesNecksCirc['Density'] == 'equal'].iloc[:, -10:].mean().values][0], c='cornflowerblue')
-    ax[1, 0].errorbar(maskSizes, [densitiesNecksCirc[densitiesNecksCirc['Density'] == 'equal'].iloc[:, -10:].mean().values][0], yerr=[densitiesNecksCirc[densitiesNecksCirc['Density'] == 'equal'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'cornflowerblue', linewidth=2, capsize=3, alpha=0.5, label='necks')
-    ax[1, 0].scatter(maskSizes, [densitiesNoneCirc[densitiesNoneCirc['Density'] == 'equal'].iloc[:, -10:].mean().values][0], c='seagreen', alpha=0.25)
-    ax[1, 0].errorbar(maskSizes, [densitiesNoneCirc[densitiesNoneCirc['Density'] == 'equal'].iloc[:, -10:].mean().values][0], yerr=[densitiesNoneCirc[densitiesNoneCirc['Density'] == 'equal'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'seagreen', linewidth=2, capsize=3, alpha=0.25, label='none')
-    ax[1, 0].set_ylabel('Density')
-    ax[1, 0].set_xlabel('Mask radius')
-    ax[1, 0].set_xticks(maskSizes)
-    ax[1, 0].set_xticklabels(maskSizes)
-    # lobe-centered distribution
-    ax[1, 1].scatter(maskSizes, [densitiesLobesCirc[densitiesLobesCirc['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], c='darkorange')
-    ax[1, 1].errorbar(maskSizes, [densitiesLobesCirc[densitiesLobesCirc['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], yerr=[densitiesLobesCirc[densitiesLobesCirc['Density'] == 'lobe'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'darkorange', linewidth=2, capsize=3, alpha=0.5, label='lobes')
-    ax[1, 1].scatter(maskSizes, [densitiesNecksCirc[densitiesNecksCirc['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], c='cornflowerblue')
-    ax[1, 1].errorbar(maskSizes, [densitiesNecksCirc[densitiesNecksCirc['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], yerr=[densitiesNecksCirc[densitiesNecksCirc['Density'] == 'lobe'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'cornflowerblue', linewidth=2, capsize=3, alpha=0.5, label='necks')
-    ax[1, 1].scatter(maskSizes, [densitiesNoneCirc[densitiesNoneCirc['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], c='seagreen', alpha=0.25)
-    ax[1, 1].errorbar(maskSizes, [densitiesNoneCirc[densitiesNoneCirc['Density'] == 'lobe'].iloc[:, -10:].mean().values][0], yerr=[densitiesNoneCirc[densitiesNoneCirc['Density'] == 'lobe'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'seagreen', linewidth=2, capsize=3, alpha=0.25, label='none')
-    ax[1, 1].set_ylabel('Density')
-    ax[1, 1].set_xlabel('Mask radius')
-    ax[1, 1].set_xticks(maskSizes)
-    ax[1, 1].set_xticklabels(maskSizes)
-    # neck-centered distribution
-    ax[1, 2].scatter(maskSizes, [densitiesLobesCirc[densitiesLobesCirc['Density'] == 'neck'].iloc[:, -10:].mean().values][0], c='darkorange')
-    ax[1, 2].errorbar(maskSizes, [densitiesLobesCirc[densitiesLobesCirc['Density'] == 'neck'].iloc[:, -10:].mean().values][0], yerr=[densitiesLobesCirc[densitiesLobesCirc['Density'] == 'neck'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'darkorange', linewidth=2, capsize=3, alpha=0.5, label='lobes')
-    ax[1, 2].scatter(maskSizes, [densitiesNecksCirc[densitiesNecksCirc['Density'] == 'neck'].iloc[:, -10:].mean().values][0], c='cornflowerblue')
-    ax[1, 2].errorbar(maskSizes, [densitiesNecksCirc[densitiesNecksCirc['Density'] == 'neck'].iloc[:, -10:].mean().values][0], yerr=[densitiesNecksCirc[densitiesNecksCirc['Density'] == 'neck'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'cornflowerblue', linewidth=2, capsize=3, alpha=0.5, label='necks')
-    ax[1, 2].scatter(maskSizes, [densitiesNoneCirc[densitiesNoneCirc['Density'] == 'neck'].iloc[:, -10:].mean().values][0], c='seagreen', alpha=0.25)
-    ax[1, 2].errorbar(maskSizes, [densitiesNoneCirc[densitiesNoneCirc['Density'] == 'neck'].iloc[:, -10:].mean().values][0], yerr=[densitiesNoneCirc[densitiesNoneCirc['Density'] == 'neck'].iloc[:, -10:].sem().values[0]], fmt = 'o', color = 'seagreen', linewidth=2, capsize=3, alpha=0.25, label='none')
-    ax[1, 2].set_ylabel('Density')
-    ax[1, 2].set_xlabel('Mask radius')
-    ax[1, 2].set_xticks(maskSizes)
-    ax[1, 2].set_xticklabels(maskSizes)
-    ax[0, 0].set_ylim([0.3, 0.4])
-    ax[0, 1].set_ylim([0.05, 0.7])
-    ax[0, 2].set_ylim([0.05, 0.7])
-    ax[1, 0].set_ylim([0.3, 0.4])
-    ax[1, 1].set_ylim([0.05, 0.7])
-    ax[1, 2].set_ylim([0.05, 0.7])
-    ax[0, 0].legend()
-    plt.tight_layout()
-    fig.savefig(pathPlotsSupplementary / 'FigureS1_SyntheticPCs_OptimalDensityMasks.png', bbox_inches='tight', dpi=300)
-    plt.close()
-    
-    ### statistics
-    pValues = pd.DataFrame(columns=['Mask', 'Type', 'MaskSize', 'ANOVA', 'Lobe~Neck', 'Lobe~None', 'Neck~None'])
-
-    masks = ['perpendicular', 'circular']
-    datasetType = ['equal', 'lobe', 'neck']
-    for mask in masks:
-        for d in datasetType:
-            for m in maskSizes:
-                data = pd.DataFrame({'Values': pd.concat([tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'lobe')]['length=' + str(m)], tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'neck')]['length=' + str(m)], tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'none')]['length=' + str(m)]]),
-                                     'Group': (['lobe'] * len(tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'lobe')]['length=' + str(m)]) + ['neck'] * len(tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'neck')]['length=' + str(m)]) + ['none'] * len(tableDensities[(tableDensities['Mask'] == mask) & (tableDensities['Density'] == d) & (tableDensities['NodeType'] == 'none')]['length=' + str(m)]))})
-               
-                eval_var = pg.homoscedasticity(data=data, dv='Values', group='Group')['equal_var'].iloc[0]
-                if eval_var:
-                    aov = pg.anova(data=data, dv='Values', between='Group')['p-unc'].values[0]
-                    posthoc = pg.pairwise_tukey(data=data, dv='Values', between='Group')['p-tukey'].values
-                else:
-                    aov = pg.welch_anova(data=data, dv='Values', between='Group')['p-unc'].values[0]
-                    posthoc = pg.pairwise_gameshowell(data=data, dv='Values', between='Group')[ 'pval'].values
-
-                dataAppend = [mask, d, m, format(aov, '.2e'), format(posthoc[0], '.2e'), format(posthoc[1], '.2e'), format(posthoc[2], '.2e')]
-                pValues.loc[len(pValues)] = dataAppend
-    
-    
-    tableFigS1 = Table(title='P-values for different density mask sizes in lobe and neck regions')
-    for col in pValues.columns:
-        tableFigS1.add_column(str(col))
-    for _, row in pValues.iterrows():
-        tableFigS1.add_row(*[str(v) for v in row])
-
-    console.print('[bold blue]Supplementary Figure 1[/bold blue]')
-    console.print(tableFigS1)
-    
-    
-    ###############################
-    ########## Figure S2 ##########
     ###############################   
     colors = ['#2ca02c', '#2ca02c', '#e377c2', '#e377c2']
     hatches = ['', '/', '', '/']
@@ -452,21 +234,21 @@ def main():
         box.set_edgecolor('black')    
         box.set_alpha(1)                 
     plt.tight_layout()
-    fig.savefig(pathPlotsSupplementary / 'FigureS2_Cotyledons_CytoskeletonDensityMasks_WT_Mutant.png', bbox_inches='tight', dpi=300)
+    fig.savefig(pathPlotsSupplementary / 'FigureS1_Cotyledons_CytoskeletonDensityMasks_WT_Mutant.png', bbox_inches='tight', dpi=300)
     plt.close()    
     
-    tableFigS2 = Table(title='P-values for different mask approaches of AF and MT in lobes and necks')
-    tableFigS2.add_column('', justify='left')
-    tableFigS2.add_column('Perpendicular mask', justify='center')
-    tableFigS2.add_column('', justify='center')
-    tableFigS2.add_column('Circular mask', justify='center')
-    tableFigS2.add_column('', justify='center')
-    tableFigS2.add_column('Polygonal mask', justify='center')
-    tableFigS2.add_column('', justify='center')
+    tableFigS1 = Table(title='P-values for different mask approaches of AF and MT in lobes and necks')
+    tableFigS1.add_column('', justify='left')
+    tableFigS1.add_column('Perpendicular mask', justify='center')
+    tableFigS1.add_column('', justify='center')
+    tableFigS1.add_column('Circular mask', justify='center')
+    tableFigS1.add_column('', justify='center')
+    tableFigS1.add_column('Polygonal mask', justify='center')
+    tableFigS1.add_column('', justify='center')
     
-    tableFigS2.add_row('', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]')
+    tableFigS1.add_row('', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]', '[blue]WT[/blue]', '[blue]act2-1act7-1[/blue]')
     
-    tableFigS2.add_row('AF density', 
+    tableFigS1.add_row('AF density', 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesR, 'WT', 'AFs', 'lobe'), extract_cell_data(localDensitiesC, 'WT', 'AFs', 'neck'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesR, 'act2-1act7-1', 'AFs', 'lobe'), extract_cell_data(localDensitiesC, 'act2-1act7-1', 'AFs', 'neck'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesC, 'WT', 'AFs', 'lobe'), extract_cell_data(localDensitiesC, 'WT', 'AFs', 'neck'))[1], '.2e')), 
@@ -474,7 +256,7 @@ def main():
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesP, 'WT', 'AFs', 'outside'), extract_cell_data(localDensitiesP, 'WT', 'AFs', 'inside'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesP, 'act2-1act7-1', 'AFs', 'outside'), extract_cell_data(localDensitiesP, 'act2-1act7-1', 'AFs', 'inside'))[1], '.2e')))
     
-    tableFigS2.add_row('MT density', 
+    tableFigS1.add_row('MT density', 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesR, 'WT', 'MTs', 'lobe'), extract_cell_data(localDensitiesC, 'WT', 'MTs', 'neck'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesR, 'act2-1act7-1', 'MTs', 'lobe'), extract_cell_data(localDensitiesC, 'act2-1act7-1', 'MTs', 'neck'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesC, 'WT', 'MTs', 'lobe'), extract_cell_data(localDensitiesC, 'WT', 'MTs', 'neck'))[1], '.2e')), 
@@ -482,10 +264,10 @@ def main():
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesP, 'WT', 'MTs', 'outside'), extract_cell_data(localDensitiesP, 'WT', 'MTs', 'inside'))[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_cell_data(localDensitiesP, 'act2-1act7-1', 'MTs', 'outside'), extract_cell_data(localDensitiesP, 'act2-1act7-1', 'MTs', 'inside'))[1], '.2e')))
     
-    tableFigS2.add_row('', '', '', '', '', '', '')
-    tableFigS2.add_row('', '[blue]AF[/blue]', '[blue]MT[/blue]', '[blue]AF[/blue]', '[blue]MT[/blue]', '[blue]AF[/blue]', '[blue]MT[/blue]')
+    tableFigS1.add_row('', '', '', '', '', '', '')
+    tableFigS1.add_row('', '[blue]AF[/blue]', '[blue]MT[/blue]', '[blue]AF[/blue]', '[blue]MT[/blue]', '[blue]AF[/blue]', '[blue]MT[/blue]')
     
-    tableFigS2.add_row('Cytoskeleton density (lobes/necks)', 
+    tableFigS1.add_row('Cytoskeleton density (lobes/necks)', 
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesR[(localDensitiesR['Genotype'] =='WT') & (localDensitiesR['Filament'] == 'AFs')], 'perp')[0], extract_ratio_from_df(localDensitiesR[(localDensitiesR['Genotype'] =='act2-1act7-1') & (localDensitiesR['Filament'] == 'AFs')], 'perp')[0])[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesR[(localDensitiesR['Genotype'] =='WT') & (localDensitiesR['Filament'] == 'MTs')], 'perp')[0], extract_ratio_from_df(localDensitiesR[(localDensitiesR['Genotype'] =='act2-1act7-1') & (localDensitiesR['Filament'] == 'MTs')], 'perp')[0])[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesC[(localDensitiesC['Genotype'] =='WT') & (localDensitiesC['Filament'] == 'AFs')], 'circ')[0], extract_ratio_from_df(localDensitiesC[(localDensitiesC['Genotype'] =='act2-1act7-1') & (localDensitiesC['Filament'] == 'AFs')], 'circ')[0])[1], '.2e')), 
@@ -493,12 +275,12 @@ def main():
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesP[(localDensitiesP['Genotype'] =='WT') & (localDensitiesP['Filament'] == 'AFs')], 'poly')[0], extract_ratio_from_df(localDensitiesP[(localDensitiesP['Genotype'] =='act2-1act7-1') & (localDensitiesP['Filament'] == 'AFs')], 'poly')[0])[1], '.2e')), 
                        str(format(sp.stats.mannwhitneyu(extract_ratio_from_df(localDensitiesP[(localDensitiesP['Genotype'] =='WT') & (localDensitiesP['Filament'] == 'MTs')], 'poly')[0], extract_ratio_from_df(localDensitiesP[(localDensitiesP['Genotype'] =='act2-1act7-1') & (localDensitiesP['Filament'] == 'MTs')], 'poly')[0])[1], '.2e')))
     
-    console.print('[bold blue]Supplementary Figure 2[/bold blue]')
-    console.print(tableFigS2)
+    console.print('[bold blue]Supplementary Figure 1[/bold blue]')
+    console.print(tableFigS1)
 
     
     ###############################
-    ########## Figure S3 ##########
+    ########## Figure S2 ##########
     ###############################  
 
     filaments = ['AFs', 'MTs']
@@ -525,12 +307,12 @@ def main():
                     ax.text(-0.05, 0.5, fil + ' - ' + rep, transform=ax.transAxes, rotation=90, va='center', ha='right')
                 idx += 1
     plt.tight_layout()               
-    fig.savefig(pathPlotsSupplementary / 'FigureS3_ExtractedCells_WT.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS2_ExtractedCells_WT.png', bbox_inches='tight', dpi=300)               
     plt.close()
     
     
     ###############################
-    ########## Figure S4 ##########
+    ########## Figure S3 ##########
     ###############################  
 
     ### act2-1act7-1
@@ -554,12 +336,12 @@ def main():
                     ax.text(-0.05, 0.5, fil + ' - ' + rep, transform=ax.transAxes, rotation=90, va='center', ha='right')
                 idx += 1
     plt.tight_layout()               
-    fig.savefig(pathPlotsSupplementary / 'FigureS4_ExtractedCells_act2-1act7-1.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS3_ExtractedCells_act2-1act7-1.png', bbox_inches='tight', dpi=300)               
     plt.close()
     
     
     ###############################
-    ########## Figure S5 ##########
+    ########## Figure S4 ##########
     ###############################  
     
     ### create heatmaps of relative completeness in leaves for WT and act2-1act7-1
@@ -577,10 +359,10 @@ def main():
         for idx, tp in enumerate(cells[gt].keys()):
             if gt == 'WT':
                 resolution = 1 / 10.9051
-                name = 'FigureS5A_Leaves_LobeynessHeatmap_WT.png'
+                name = 'FigureS4A_Leaves_LobeynessHeatmap_WT.png'
             else:
                 resolution = 1 / 6.5445
-                name = 'FigureS5B_Leaves_LobeynessHeatmap_Mutant.png'
+                name = 'FigureS4B_Leaves_LobeynessHeatmap_Mutant.png'
             imageDilated, labeledImageSelected, labelsSelected = extract_selected_cells(cells, gt, tp, pathLeaves)    
             lobeyness = extract_selected_cell_properties(labeledImageSelected, labelsSelected, resolution, 'lobeyness')
              
@@ -665,11 +447,11 @@ def main():
         yvalM = ax[i].lines[3].get_ydata()[np.where(np.round(ax[i].lines[3].get_xdata(), 2) == np.around(meanM, 2))[0][0]]
         ax[i].plot([meanWT, meanWT], [ymin, yvalWT], color='gray', ls='-', zorder=200)
         ax[i].plot([meanM, meanM], [ymin, yvalM], color='gray', ls='--', zorder=200)
-    fig.savefig(pathPlotsSupplementary / 'FigureS5C_Leaves_LobeynessDistributions_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS4C_Leaves_LobeynessDistributions_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()
     
     # statistics
-    console.print('[bold blue]Supplementary Figure 5[/bold blue]')
+    console.print('[bold blue]Supplementary Figure 4[/bold blue]')
     print('Lobeyness (WT vs. M): \n...0h:', sp.stats.mannwhitneyu(dataLobeynessWT[0], dataLobeynessM[0])[1], '\n...12h:', sp.stats.mannwhitneyu(dataLobeynessWT[1], dataLobeynessM[1])[1], '\n...24h:', sp.stats.mannwhitneyu(dataLobeynessWT[2], dataLobeynessM[2])[1], '\n...36h:', sp.stats.mannwhitneyu(dataLobeynessWT[3], dataLobeynessM[3])[1])
     
     
@@ -689,7 +471,7 @@ def main():
     plt.errorbar([dataLobesM[idx].mean() for idx in range(4)], [dataLobeynessM[idx].mean() for idx in range(4)], yerr=[[dataLobeynessM[idx].mean() - dataLobeynessM[idx].quantile(q=0.25) for idx in range(4)], [dataLobeynessM[idx].quantile(q=0.75) - dataLobeynessM[idx].mean() for idx in range(4)]], xerr=[[dataLobesM[idx].mean() - dataLobesM[idx].quantile(q=0.25) for idx in range(4)], [dataLobesM[idx].quantile(q=0.75) - dataLobesM[idx].mean() for idx in range(4)]], fmt = 'o', color = 'gold', linewidth=2, capsize=3, alpha=0.5)
     ax.set_ylabel('Lobeyness')
     ax.set_xlabel('Number of true lobes')
-    fig.savefig(pathPlotsSupplementary / 'FigureS5D_Leaves_LobeynessLobes_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS4D_Leaves_LobeynessLobes_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()
 
     # statistical significance (Hotelling's T2 test)
@@ -721,12 +503,12 @@ def main():
     ax.set_ylabel('Lobeyness')
     ax.set_xlabel('log(Area_sc)')
     plt.legend()
-    fig.savefig(pathPlotsSupplementary / 'FigureS5E_Leaves_LobeynessArea_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlotsSupplementary / 'FigureS4E_Leaves_LobeynessArea_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()   
     
     
     ###############################
-    ########## Figure S6 ##########
+    ########## Figure S5 ##########
     ###############################
 
     ### calculate AGR and RGR from selected cell areas
@@ -866,7 +648,7 @@ def main():
     cbarR = fig.colorbar(imR, ax=ax[1, 3], fraction=0.046, pad=0.04)
     cbarR.set_label('Relative growth rate [h^-1]', rotation=90, labelpad=20)    
     plt.tight_layout()
-    fig.savefig(pathPlotsSupplementary / 'FigureS6AB_Leaves_AGR_RGR_Heatmaps_WT_Mutant.png', bbox_inches='tight', dpi=300) 
+    fig.savefig(pathPlotsSupplementary / 'FigureS5AB_Leaves_AGR_RGR_Heatmaps_WT_Mutant.png', bbox_inches='tight', dpi=300) 
     plt.close()
         
     #######
@@ -921,11 +703,11 @@ def main():
         box.set_alpha(1)
     ax[1].set_ylabel('Relative growth rate [h^-1]')
     ax[1].set_ylim(0.01, 0.06)
-    fig.savefig(pathPlotsSupplementary / 'FigureS6C_Leaves_AGR_RGR_Boxplots_WT_Mutant.png', bbox_inches='tight', dpi=300)
+    fig.savefig(pathPlotsSupplementary / 'FigureS5C_Leaves_AGR_RGR_Boxplots_WT_Mutant.png', bbox_inches='tight', dpi=300)
     plt.close()
 
     # statistical test
-    console.print('[bold blue]Supplementary Figure 6[/bold blue]')
+    console.print('[bold blue]Supplementary Figure 5[/bold blue]')
     print('\nAbsolute growth rate')
     print('...P-value (0-24h):', sp.stats.ttest_ind(agr0_24['WT'], agr0_24['act2-1act7-1'])[1])
     print('...P-value (12-36h):', sp.stats.ttest_ind(agr12_36['WT'], agr12_36['act2-1act7-1'])[1])
@@ -1357,37 +1139,6 @@ def main():
     
     
 ###############################################################################
-def load_pickle_file(pathToPickleFile):
-   data = {}
-   counter = 1
-   with open(pathToPickleFile, 'rb') as pickleFile:
-      try:
-         while True:
-            obj = pickle.load(pickleFile)
-            try:
-               data = obj
-            except (AttributeError, TypeError):
-               data[counter] = obj
-               counter += 1
-      except EOFError:
-         pass
-   return(data)   
-
-    
-def get_lobe_neck_positions(graph):
-    nodePos = nx.get_node_attributes(graph, 'pos')
-    lobeIndices, neckIndices = GE.count_lobes_and_necks(graph)
-    lobePos = {}
-    neckPos = {}
-    nodeIndices = list(graph.nodes)
-    for nodeIdx in nodeIndices:
-        if nodeIdx in lobeIndices:
-            lobePos[nodeIdx] = nodePos[nodeIdx]
-        if nodeIdx in neckIndices:
-            neckPos[nodeIdx] = nodePos[nodeIdx]
-    return(lobePos, neckPos)
-
-
 def merge_cells_from_labels(labelList, labeledImage):
     """
     given two cell labels, merge the cells into one
