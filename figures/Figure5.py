@@ -27,7 +27,7 @@ import src.GraVisExtraction as GE
 ###############################################################################
 
 # =========================
-# Figure 4
+# Figure 5
 # Analysis of pavement cell shape complexity in cotyledons of wild-type and act2-1 act7-1
 # plants.
 # =========================
@@ -62,11 +62,11 @@ def main():
         if gt == 'WT':
             labeledImage = np.load(pathCotyledon / 'MTs/WT/WT_4/labeledCells.npy')
             resolution = 1 / 6.9144
-            name = 'Figure4A_Cotyledons_ComplexityHeatmap_WT.png'
+            name = 'Figure5A_Cotyledons_ComplexityHeatmap_WT.png'
         else:
             labeledImage = np.load(pathCotyledon / 'MTs/act2-1act7-1/act2act7_1/labeledCells.npy')
             resolution = 1 / 6.9476
-            name = 'Figure4B_Cotyledons_ComplexityHeatmap_Mutant.png'
+            name = 'Figure5B_Cotyledons_ComplexityHeatmap_Mutant.png'
             
         # cell outlines
         selectedCells = labeledImage.copy() * 0
@@ -217,7 +217,7 @@ def main():
     ax[2].set_xlabel('log(Area_sc)')
     ax[2].legend()
     plt.tight_layout()
-    fig.savefig(pathPlots / 'Figure4C-E_Cotyledons_ShapeComplexityLobesArea_WT_Mutant.png', bbox_inches='tight', dpi=300)               
+    fig.savefig(pathPlots / 'Figure5C-E_Cotyledons_ShapeComplexityLobesArea_WT_Mutant.png', bbox_inches='tight', dpi=300)               
     plt.close()
 
 ###############################################################################
