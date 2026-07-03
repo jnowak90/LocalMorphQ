@@ -24,9 +24,9 @@ import matplotlib.pyplot as plt
 # add current script directory to path
 pathScript = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(pathScript))
-import GraVisPreprocessing as GP
-import GraVisExtraction as GE
-import GraVisUtils as utils
+from . import GraVisPreprocessing as GP
+from . import GraVisExtraction as GE
+from . import GraVisUtils as utils
 
 
 ###############################################################################
