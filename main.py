@@ -12,7 +12,7 @@ from pathlib import Path
 
 pathScript = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(pathScript))
-import src.Processing
+import src.Processing as Processing
 
 ###############################################################################
 def load_config(path):
